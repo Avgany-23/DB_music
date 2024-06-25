@@ -1,0 +1,51 @@
+DROP TABLE IF EXISTS Employees CASCADE;
+DROP TABLE IF EXISTS Department CASCADE;
+DROP TABLE IF EXISTS EmpDepart CASCADE;
+
+CREATE TABLE IF NOT EXISTS Employees
+(
+	id SERIAL PRIMARY KEY,
+    full_name VARCHAR(50) NOT NULL,
+    id_boss INT,
+    FOREIGN KEY (id_boss) REFERENCES Employees (id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS Department
+(
+	id SERIAL PRIMARY KEY,
+    name_department VARCHAR(50) NOT NULL
+); 
+
+CREATE TABLE IF NOT EXISTS EmpDepart
+(
+	id SERIAL PRIMARY KEY,
+    id_depart INT,
+    id_empl INT,
+	FOREIGN KEY (id_depart) REFERENCES Department (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (id_empl) REFERENCES Employees (id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+INSERT INTO Employees (full_name, id_boss)
+VALUES ('Jon Van', Null),
+	  ('Tendy Rodan', 4),
+      ('Vova Ivanov', 2),
+      ('Vitalyi Koveb', NULL),
+      ('Andrey Konev', 4);
+
+INSERT INTO Department (name_department)
+VALUES ('Devolopers'),
+	  ('Devops');
+
+INSERT INTO EmpDepart (id_depart, id_empl)
+VALUES (1, 2),
+	  (1, 1),
+      (2, 3),
+      (1, 5),
+      (2, 4);
+
+SELECT full_name AS NameEmployee,
+	   (SELECT full_name FROM Employees AS emp WHERE emp.id = Employees.id_boss) AS BossName,
+       name_department AS Department
+FROM Employees JOIN EmpDepart ON EmpDepart.id_empl = Employees.id
+JOIN Department ON Department.id = EmpDepart.id_depart
+ORDER BY NameEmployee;
